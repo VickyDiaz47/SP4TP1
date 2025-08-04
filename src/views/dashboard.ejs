@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard de Superhéroes</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+
+  <div class="container">
+    <% if (typeof eliminado !== 'undefined') { %>
+      <div id="mensajeExito"> Superhéroe "<%= eliminado %>" eliminado con éxito.</div>
+    <% } %>
+    
+    
+    <div class="contenedor-btn">
+      <h1>Lista de Superhéroes</h1>
+    </div>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Buscar superhéroe por nombre..." />
+    </div>
+
+    <% if (heroes.length === 0) { %>
+      <p>No hay superhéroes cargados.</p>
+    <% } else { %>
+      <div class="grid">
+  <% heroes.forEach(hero => { %>
+    <div class="card superhero-card"> <!-- Clase agregada: superhero-card -->
+
+      <% if (hero.imagen) { %>
+        <img src="<%= hero.imagen %>" alt="Imagen de <%= hero.nombreSuperHeroe %>" class="img-hero">
+      <% } %>
+
+      <h2 class="superhero-name"><%= hero.nombreSuperHeroe %></h2> <!-- Clase agregada: superhero-name -->
+      <p><strong>Nombre real:</strong> <%= hero.nombreReal %></p>
+      <p><strong>Edad:</strong> <%= hero.edad %></p>
+      <p><strong>Planeta:</strong> <%= hero.planetaOrigen %></p>
+      <p><strong>Debilidad:</strong> <%= hero.debilidad %></p>
+      <p><strong>Poderes:</strong> <%= hero.poderes.join(', ') %></p>
+      <p><strong>Aliados:</strong> <%= hero.aliados.join(', ') %></p>
+      <p><strong>Enemigos:</strong> <%= hero.enemigos.join(', ') %></p>
+      <p><strong>Creador:</strong> <%= hero.creador.join(', ') %></p>
+
+      <div class="card-buttons">
+        <a href="/superheroes/editar/<%= hero._id %>" class="btn btn-primary">Editar</a>
+        <button class="btn btn-danger" onclick="confirmarEliminacion('<%= hero._id %>', '<%= hero.nombreSuperHeroe %>')">Eliminar</button>
+      </div>
+    </div>
+  <% }) %>
+</div>
+    <% } %>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalConfirmacion" class="modal">
+    <div class="modal-content">
+      <p id="mensajeConfirmacion">¿Estás seguro de que deseas eliminar a este superhéroe?</p>
+      <form id="formEliminar" method="POST">
+        <input type="hidden" name="_method" value="DELETE" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function confirmarEliminacion(id, nombre) {
+      document.getElementById('mensajeConfirmacion').innerText =
+        `¿Estás seguro de que deseas eliminar a ${nombre}?`;
+      document.getElementById('formEliminar').action = `/superheroes/${id}?_method=DELETE`;
+      document.getElementById('modalConfirmacion').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+      document.getElementById('modalConfirmacion').style.display = 'none';
+    }
+
+    // Ocultar modal si se hace clic fuera
+    window.onclick = function (event) {
+      const modal = document.getElementById('modalConfirmacion');
+      if (event.target === modal) {
+        cerrarModal();
+      }
+    };
+
+    // Mensaje de éxito tras eliminación
+    document.addEventListener('DOMContentLoaded', () => {
+      const mensaje = document.getElementById('mensajeExito');
+      if (mensaje) {
+        mensaje.style.display = 'block';
+        setTimeout(() => {
+          mensaje.style.display = 'none';
+
+          // Limpiar el parámetro "eliminado" de la URL sin recargar
+      const url = new URL(window.location);
+      url.searchParams.delete('eliminado');
+      window.history.replaceState({}, document.title, url);
+        }, 2000);
+      }
+    });
+  </script>
+
+
+ <!-- script para busqueda -->
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchInput');
+  const cards = document.querySelectorAll('.superhero-card');
+  const grid = document.querySelector('.grid');
+
+  searchInput.addEventListener('input', () => {
+    const filter = searchInput.value.trim().toLowerCase();
+    let hayCoincidencias = false;
+
+    cards.forEach(card => {
+      const name = card.querySelector('.superhero-name').textContent.toLowerCase();
+      if (name.includes(filter)) {
+        card.classList.remove('hidden');
+        hayCoincidencias = true;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    // Mostrar mensaje si no hay coincidencias
+    let mensaje = document.getElementById('noResults');
+    if (!hayCoincidencias) {
+      if (!mensaje) {
+        mensaje = document.createElement('p');
+        mensaje.id = 'noResults';
+        mensaje.textContent = 'No se encontraron superhéroes.';
+        mensaje.style.color = '#fff';
+        mensaje.style.textAlign = 'center';
+        grid.parentNode.insertBefore(mensaje, grid.nextSibling);
+      }
+    } else {
+      if (mensaje) mensaje.remove();
+    }
+  });
+});
+</script>
+</body>
+</html>

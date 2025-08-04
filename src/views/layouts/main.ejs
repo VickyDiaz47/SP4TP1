@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title || "App de Superhéroes" %></title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <%- include('../partials/navbar') %>
+
+  <main>
+    <%- body %>
+
+    
+  </main>
+
+  <footer>
+    <%- include('../partials/footer') %>
+  </footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+
+    // Abrir/cerrar con el botón hamburguesa
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation(); // Evita que se propague al document
+      navLinks.classList.toggle('active');
+    });
+
+    // Evita cierre si se hace clic dentro del menú
+    navLinks.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Cierra el menú si se hace clic fuera
+    document.addEventListener('click', () => {
+      navLinks.classList.remove('active');
+    });
+  });
+</script>
+
+</body>
+
+</html>
